@@ -11,6 +11,7 @@ export default function ReportPage() {
   const [description, setDescription] = useState("");
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [type, setType] = useState("EARTHQUAKE");
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState<Disaster[]>([]);
   const [isVisible, setIsVisible] = useState(false);
@@ -74,6 +75,7 @@ export default function ReportPage() {
         recommended_skills: recommended_skills ?? "",
         status: "ACTIVE",
         classify_ms: classify_ms ?? null,
+        type,
       });
 
       if (insertError) throw insertError;
@@ -81,10 +83,10 @@ export default function ReportPage() {
       await fetch("/api/trigger-alert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, lat, lng, severity }),
+        body: JSON.stringify({ title, description, lat, lng, severity, type }),
       });
 
-      setTitle(""); setDescription(""); setLat(""); setLng("");
+      setTitle(""); setDescription(""); setLat(""); setLng(""); setType("EARTHQUAKE");
     } catch (err) {
       console.error(err);
       alert("Error saving report");
@@ -167,9 +169,25 @@ export default function ReportPage() {
                     className="w-full pl-11 pr-4 py-3 bg-white/60 border border-gray-300 rounded-xl text-black placeholder-gray-500 focus:outline-none transition-colors resize-none"
                     onFocus={(e) => e.currentTarget.style.borderColor = '#c1121f'}
                     onBlur={(e) => e.currentTarget.style.borderColor = 'rgb(209 213 219)'}
-                  />
-                </div>
+                  ></textarea>
 
+
+                  <div className="relative">
+                    <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/60 border border-gray-300 rounded-xl text-black focus:outline-none"
+                    >
+                      <option value="EARTHQUAKE">🌍 Earthquake</option>
+                      <option value="FLOOD">🌊 Flood</option>
+                      <option value="WILDFIRE">🔥 Wildfire</option>
+                      <option value="CYCLONE">🌀 Cyclone</option>
+                      <option value="LANDSLIDE">⛰️ Landslide</option>
+                      <option value="STORM">⛈️ Storm</option>
+                      </select>
+                      </div>
+                    </div>  
+          
                 <div className="grid grid-cols-2 gap-3">
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
@@ -265,15 +283,44 @@ export default function ReportPage() {
                         <div className="flex justify-between items-start mb-2 gap-2">
                           <div className="flex items-center gap-2 flex-wrap min-w-0">
                             <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: statusColor, animation: isResolved ? 'none' : 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' }}></div>
-                            <h4 className="font-semibold text-black text-sm truncate">{r.title}</h4>
-                            {r.severity && (
-                              <span className="text-xs font-bold px-2 py-0.5 rounded text-white flex-shrink-0" style={{ backgroundColor: severityColor }}>
-                                {r.severity}
-                              </span>
-                            )}
-                            <span className="text-xs font-semibold px-2 py-0.5 rounded flex-shrink-0" style={{ backgroundColor: `${statusColor}22`, color: statusColor }}>
-                              {r.status ?? 'ACTIVE'}
-                            </span>
+                            <h4 className="font-semibold text-black text-sm truncate">
+                              {r.title}
+                              </h4>
+                              {r.type && (
+                                <span
+                                className="text-xs font-bold px-2 py-0.5 rounded text-white flex-shrink-0"
+                                style={{
+                                  backgroundColor:
+                                  r.type === "EARTHQUAKE" ? "#2563eb" :
+                                  r.type === "FLOOD" ? "#06b6d4" :
+                                  r.type === "WILDFIRE" ? "#ef4444" :
+                                  r.type === "CYCLONE" ? "#8b5cf6" :
+                                  r.type === "LANDSLIDE" ? "#a16207" :
+                                  "#eab308",
+                                }}
+                                >
+                                  {r.type}
+                                  </span>
+                                )}
+                                
+                                {r.severity && (
+                                  <span
+                                  className="text-xs font-bold px-2 py-0.5 rounded text-white flex-shrink-0"
+                                  style={{ backgroundColor: severityColor }}
+                                  >
+                                    {r.severity}
+                                    </span>
+                                  )}
+                                  
+                                  <span
+                                  className="text-xs font-semibold px-2 py-0.5 rounded flex-shrink-0"
+                                  style={{
+                                    backgroundColor: `${statusColor}22`,
+                                    color: statusColor
+                                    }}
+                                    >
+                                      {r.status ?? "ACTIVE"}
+                                      </span>
                           </div>
                           <div className="flex items-center gap-1 text-xs text-gray-400 flex-shrink-0">
                             <Clock className="w-3 h-3" />

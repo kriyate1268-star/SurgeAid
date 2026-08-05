@@ -1,6 +1,6 @@
 export async function GET() {
   const url =
-    "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+  "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=6&maxlatitude=38&minlongitude=68&maxlongitude=98&orderby=time";
 
   try {
     const res = await fetch(url);

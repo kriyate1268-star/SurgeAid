@@ -16,6 +16,7 @@ export interface Disaster {
   description: string;
   lat: number | null;
   lng: number | null;
+  type?: string;
   severity?: Severity;
   action?: string;
   status?: IncidentStatus;
